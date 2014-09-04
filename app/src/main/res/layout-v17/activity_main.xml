@@ -1,0 +1,148 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0099cc"
+    tools:context=".MainActivity">
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@drawable/background"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/wowyunbar"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:gravity="right"
+        android:layout_height="32dp">
+        <ImageView
+            android:id="@+id/wifi_status"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/battery_status"
+            android:layout_marginRight="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginLeft="12px"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextClock
+                android:id="@+id/textclock"
+                android:textSize="50.0sp"
+                android:timeZone="GMT+0800"
+                android:textColor="@android:color/black"
+                android:format24Hour="hh:mm"
+                android:format12Hour="hh:mm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/main_week_text"
+                android:textSize="18dp"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/main_full_date"
+                android:textColor="@android:color/black"
+                android:textSize="18dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/main_lunar_text"
+                android:textColor="@android:color/black"
+                android:textSize="18dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <com.wowfly.wowyun.wowyun_device.WhellMenuView
+            android:id="@+id/whellmenu"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+            <ImageView
+                android:paddingLeft="8dp"
+                android:src="@drawable/home_disk7_opt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/center_gif"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_video_gif"
+                />
+        </FrameLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_gravity="right|bottom"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+            <ImageView
+                android:id="@+id/weather_icon"
+                android:paddingTop="32dp"
+                android:src="@drawable/clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/weather_city"
+                    android:textColor="@android:color/black"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/weather_info"
+                    android:textColor="@android:color/black"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" />
+                </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="286dp"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+<!--                <ImageView
+                    android:src="@drawable/ic_buddy_offline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />-->
+                <TextView
+                    android:id="@+id/deviceid"
+                    android:textColor="@android:color/black"
+                    android:textSize="18dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+</LinearLayout>
+</FrameLayout>

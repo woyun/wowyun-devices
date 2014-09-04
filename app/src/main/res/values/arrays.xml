@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="icontext">
+        <item>视频浏览</item>
+        <item>图片浏览</item>
+        <item>家人动态</item>
+        <item>视频通话</item>
+        <item>系统设置</item>
+        <item>实用工具</item>
+        <item>关于设备</item>
+    </string-array>
+</resources>

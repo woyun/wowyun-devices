@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">沃云</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="dialog_wifi_manager">无线列表</string>
+    <string name="input_password">密码输入</string>
+    <string name="wifi_scanning">正在扫描无线信号，请等待...</string>
+    <string name="action_connect">连接网络</string>
+    <string name="action_cancel">取消</string>
+    <string name="deviceid">设备号：</string>
+    <string name="images_header_status">当前总共有%1$d个图片文件</string>
+    <string name="videos_header_status">当前总共有%1$d个视频文件</string>
+</resources>
