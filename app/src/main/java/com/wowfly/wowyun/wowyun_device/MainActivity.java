@@ -82,11 +82,14 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
     private WifiManager mWiFi;
     private ConnectivityManager cm = null;
     private ListView mWiFiListView = null;
-    private String mDeviceID = "T";
+    private String mDeviceID = "D";
     private SharedPreferences mPref;
     private WowYunApp mAPP;
     private XMPPService mXMPP;
     public Handler mHandler;
+    private AlertDialog mWifiDlg;
+    SinaWeiBoScrapy sinaWeiBoScrapy;
+    private AutoDownloader mAutoDownloader;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -199,10 +202,49 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
         }
     }
 
+    public void onResume() {
+        super.onResume();
+
+        if(mSystemUiHider.isVisible())
+            mSystemUiHider.hide();
+    }
+
     public void onBackPressed() {
         Log.i(TAG, " ignore back key pressed");
         if(mSystemUiHider.isVisible())
           mSystemUiHider.hide();
+    }
+
+    private void startSyncSNS(String snstype, String username, String password) {
+
+    }
+
+    private void stopSyncSNS(String snstype, String username, String password) {
+
+    }
+
+    private void doSNSBind(String jid, String snstype, String username, String password) {
+        int sep = jid.indexOf("@");
+        jid = jid.substring(0, sep);
+        String key = "sns." + jid;
+        Log.i(TAG, " doSNSBind " + jid + " snstype " + snstype + " " + username + " " + password);
+        SharedPreferences.Editor editor = mPref.edit();
+        editor.putString(key+"."+snstype+".username", username);
+        editor.putString(key+"."+snstype+".password", password);
+        editor.commit();
+        startSyncSNS(snstype, username, password);
+    }
+
+    private void doSNSUnBind(String jid, String snstype, String username, String password) {
+        int sep = jid.indexOf("@");
+        jid = jid.substring(0, sep);
+        Log.i(TAG, " doSNSUnbind " + jid + " snstype " + snstype);
+        String key = "sns." + jid;
+        SharedPreferences.Editor editor = mPref.edit();
+        editor.putString(key+"."+snstype+".username", "");
+        editor.putString(key+"."+snstype+".password", "");
+        editor.commit();
+        stopSyncSNS(snstype, username, password);
     }
 
     public void chatCreated(Chat chat, boolean create) {
@@ -215,15 +257,30 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
                 if(msg.startsWith("image/")) {
                     //mView.
                     mView.incNotificationNumber(1);
-
+                    Message _msg = new Message();
+                    _msg.what = WowYunApp.UPDATE_UI;
+                    mHandler.sendMessage(_msg);
+                    //mView.invalidate();
                 } else if(msg.startsWith("video/")) {
                     mView.incNotificationNumber(0);
+                    Message _msg = new Message();
+                    _msg.what = WowYunApp.UPDATE_UI;
+                    mHandler.sendMessage(_msg);
+                    //mView.invalidate();
+                } else if(msg.startsWith("snsbind/")) {
+                    String[] items = msg.split("/");
+                    if(items[1].equals("weibo")) {
+                    }
+                    doSNSBind(message.getFrom(), items[1], items[2], items[3]);
+                } else if(msg.startsWith("snsunbind/")) {
+                    String[] items = msg.split("/");
+                    doSNSUnBind(message.getFrom(), items[1], items[2], items[3]);
                 }
             }
         });
     }
 
-    private void setDateText(TextView weekTV, TextView dateTV) {
+    private void setDateText(TextView weekTV, TextView dateTV, TextView lunarTV) {
         final Calendar c = Calendar.getInstance();
         c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
         String year = String.valueOf(c.get(Calendar.YEAR));
@@ -257,6 +314,17 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
         }
         weekTV.setText(weekText);
         dateTV.setText(year + "年" + month+ "月" + day + "日");
+
+        ChineseCalendarGB ccal = new ChineseCalendarGB();
+        ccal.setGregorian(c.get(Calendar.YEAR), c.get(Calendar.MONTH)+1, c.get(Calendar.DAY_OF_MONTH));
+        ccal.computeChineseFields();
+        ccal.computeSolarTerms();
+        //Log.i(TAG, " toString " + ccal.toString() + " " + c.get(Calendar.DAY_OF_MONTH) + " " + c.get(Calendar.MONTH));
+        //Log.i(TAG, " dateString " + ccal.getMonthTable());
+        //Log.i(TAG, " lunardate " + ccal.getDateStringExt());
+        lunarTV.setText(ccal.getDateStringExt());
+        //Log.i(TAG, " month " + ccal.)
+        //return Integer.parseInt(day);
     }
 
     private String generateDeviceID(String mac) {
@@ -270,7 +338,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
             }
             //Log.i(TAG, " val = " + val);
         }
-        mDeviceID += "9";
+        //mDeviceID += "9";
         Log.i(TAG, " deviceID = " + mDeviceID);
         TextView deviceID = (TextView) findViewById(R.id.deviceid);
         //deviceID.setTextColor(android.R.color.holo_green_dark);
@@ -280,8 +348,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        super.onKeyDown(keyCode, event);
-        //Log.i(TAG, "new key code = " + keyCode);
+        Log.i(TAG, "new key code = " + keyCode);
         switch(keyCode) {
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 mView.goPrevItem();
@@ -294,14 +361,17 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
                 Log.i(TAG, "goto Item " + selected);
                 gotoActivity(selected);
                 mView.setNotificationNumber(selected, 0);
+                mView.invalidate();
                 break;
+            case KeyEvent.KEYCODE_MENU:
+                return true;
+
             case KeyEvent.KEYCODE_BACK:
                 return true;
         }
 
         if(mSystemUiHider.isVisible())
             mSystemUiHider.hide();
-
 /*        if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             Log.i(TAG, "Volume up key event");
             mView.goNextItem();
@@ -311,7 +381,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
             mView.goPrevItem();
         }*/
 
-        return super.onKeyDown(keyCode, event);
+        return true;//super.onKeyDown(keyCode, event);
     }
 
     private void gotoActivity(int position) {
@@ -324,6 +394,27 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
             case 1:
                 cls = ImageBrowserActivity.class;
                 break;
+            case 2:
+                cls = SNSBrowserActivity.class;
+                break;
+            case 3:
+                cls = BuddyListActivity.class;
+                break;
+            case 5:
+                cls = ToolsActivity.class;
+                break;
+            case 6:
+                cls = AboutActivity.class;
+                break;
+            case 4:
+                cls = OptionActivity.class;
+                break;
+
+/*                Intent _setting = new Intent(Settings.ACTION_SETTINGS);
+                _setting.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(_setting);
+                return;*/
+
             default:
                 return;
         }
@@ -339,7 +430,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
             //weatherView.setImageBitmap(weatherInfo.getCurrentConditionIcon());
             weatherView.setImageResource(getWeatherIconResourceID(weather));
             TextView textView = (TextView) findViewById(R.id.weather_city);
-            textView.setText("HangZhou");
+            textView.setText("杭州");
             textView = (TextView) findViewById(R.id.weather_info);
             textView.setText(weather);
         }
@@ -350,7 +441,8 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
     }
 
     public void onFailParsing(final Exception e) {
-        Log.i(TAG, "parsing exception = " + e.getMessage());
+        //Log.i(TAG, "parsing yahoo weather info exception = " + e.getMessage());
+        //e.printStackTrace();
     }
 
     public void onFailFindLocation(final Exception e) {
@@ -359,7 +451,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        WhellMenuView view ;
+        final WhellMenuView view ;
         WowYunApp _app = (WowYunApp) getApplication();
 
         super.onCreate(savedInstanceState);
@@ -369,6 +461,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
         setContentView(R.layout.activity_main);
 
         mView = (WhellMenuView )findViewById(R.id.whellmenu);
+        view = mView;
         getWindowManager().getDefaultDisplay().getSize(size);
         mView.setWhellCount(7, size.y, size.x);
         //mView.setNotificationNumber(1, 6);
@@ -378,10 +471,9 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
         TextView weekText = (TextView) findViewById(R.id.main_week_text);
         //weekText.setText(getWeekText());
         TextView dateText = (TextView) findViewById(R.id.main_full_date);
-        setDateText(weekText, dateText);
-
         TextView lunarText = (TextView) findViewById(R.id.main_lunar_text);
-        lunarText.setText("农历 九月十一");
+
+        setDateText(weekText, dateText, lunarText);
 
         //LocationManager locMan = (LocationManager) this.getSystemService(this.LOCATION_SERVICE);
         //long networkTS = locMan.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getTime();
@@ -437,17 +529,36 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
         cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         mIsConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        if(mIsConnected == false) {
-            showWifiManagerDialog();
-        }
 
         mHandler = new Handler() {
             public void handleMessage(Message msg) {
                 //ImageView statusIcon = (ImageView)findViewById(R.id.login_status_icon);
                 switch (msg.what) {
+                    case WowYunApp.UPDATE_UI:
+                        mView.invalidate();
+                        break;
+
+                    case WowYunApp.SNS_WEIBO_INFO_UPDATED:
+                        Log.i(TAG, " weibo update");
+                        view.incNotificationNumber(2);
+                        break;
+
+/*                    case WebScrapy.STATUS_DOLOGIN:
+                        //Log.i(TAG, " try to login weibo background");
+                        sinaWeiBoScrapy.doLogin("吴汝旭", "xj317318");
+                        break;
+
+                    case WebScrapy.STATUS_GET_WEIBO:
+                        sinaWeiBoScrapy.getWeiBo();
+                        break;*/
+
                     case WowYunApp.ACTIVITY_DESTROY:
                         if(mSystemUiHider.isVisible())
                             mSystemUiHider.hide();
+                        break;
+
+                    case WowYunApp.XMPP_NEW_BUDDY:
+                        view.incNotificationNumber(3);
                         break;
 
                     case WowYunApp.XMPP_REGISTER_FAILURE:
@@ -469,12 +580,14 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
                                     MainActivity.this.mHandler.sendMessage(msg);
                                 }
                                 Log.i(TAG, " " + mDeviceID + " login status " + ret);
-
                             }
                         };
                         new Thread(loginRunnable).start();
                         break;
                     case WowYunApp.XMPP_LOGIN_SUCCESS:
+                        if(mWifiDlg != null)
+                           mWifiDlg.cancel();
+                        mXMPP.getBuddyList();
                         TextView deviceID = (TextView) findViewById(R.id.deviceid);
                         deviceID.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
                         //deviceID.setText(mDeviceID);
@@ -484,7 +597,11 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
             }
         };
 
-        mPref = getSharedPreferences("wowyun-mobile", MODE_PRIVATE);
+        if(mIsConnected == false) {
+            showWifiManagerDialog();
+        }
+
+        mPref = getSharedPreferences("wowyun-device", MODE_PRIVATE);
         final boolean isRegistered = mPref.getBoolean(new String("device.status.registered"), false);
         Log.i(TAG, "device.status.registered = " + isRegistered);
 
@@ -496,15 +613,16 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
                     mXMPP = mAPP.getXMPP();
                     if(mXMPP == null) {
                         try {
-                            Thread.sleep(200);
+                            Thread.sleep(300);
                         } catch (InterruptedException e) {
                             Log.i(TAG, "sleep Exception " + e.getMessage());
                             continue;
                         }
                         Log.i(TAG, "Thread goto sleep, for XMPP service initialize");
                     }
-                } while(mXMPP == null);
+                } while(mXMPP == null || (mXMPP.isConnected()==false));
                 Log.i(TAG, " XMPP = " + mXMPP);
+                mXMPP.setMainActivity(MainActivity.this);
                 mXMPP.addRosterListener(MainActivity.this.mRosterListener);
                 if(! isRegistered) {
                     boolean ret = mXMPP.doRegister(mDeviceID, mDeviceID);
@@ -528,8 +646,11 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
         };
         new Thread(runnable).start();
         //mView.setNotificationNumber(1, 9);
-
-
+        //sinaWeiBoScrapy = new SinaWeiBoScrapy(getApplicationContext(), this);
+        //sinaWeiBoScrapy.doInit();
+        //mAutoDownloader = new AutoDownloader();
+        //mAutoDownloader.doInit(getBaseContext());
+        //mAutoDownloader.doSync(mDeviceID);
     }
 
     private LocationListener locationListener = new LocationListener() {
@@ -681,9 +802,9 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener, 
         final View layout = inflater.inflate(R.layout.dialog_wifi_manager, null);
         builder.setView(layout);
 
-        final AlertDialog dlg = builder.create();
-        dlg.show();
-        dlg.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        mWifiDlg = builder.create();
+        mWifiDlg.show();
+        mWifiDlg.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
                 unregisterReceiver(mWifiReceiver);

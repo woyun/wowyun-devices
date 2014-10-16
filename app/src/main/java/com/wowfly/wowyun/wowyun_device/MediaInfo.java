@@ -296,6 +296,10 @@ public class MediaInfo {
         }
 
         mImageInfo.clear();
+        Log.i(TAG, " c = " + c);
+        if(c == null)
+            return null;
+
         int total = c.getCount();
         mImageNum = total;
         if(total <= 0) {

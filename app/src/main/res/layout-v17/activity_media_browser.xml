@@ -28,8 +28,8 @@
             android:id="@+id/media_gridview"
             android:stretchMode="columnWidth"
             android:gravity="center"
-            android:horizontalSpacing="2dip"
-            android:verticalSpacing="16dip"
+            android:horizontalSpacing="4dip"
+            android:verticalSpacing="12dip"
             android:scrollbarStyle="insideOverlay"
             android:columnWidth="@dimen/itemSize"
             android:numColumns="5"
@@ -37,6 +37,4 @@
             android:layout_height="wrap_content">
         </GridView>
     </RelativeLayout>
-
-
 </LinearLayout>

@@ -260,14 +260,15 @@ public class WhellMenuView extends ImageView{
 
             circlePaint.setStyle(Paint.Style.FILL);
             //canvas.drawCircle(700, 10, 22.0f, circlePaint);
-            canvas.drawCircle(x1, y1, 26.0f, circlePaint);
+            canvas.drawCircle(x1, y1, 20.0f, circlePaint);
 
             Path _path = new Path();
             //_path.arcTo(rectF, _degress-120.0f, 20.0f, true);
-            _path.addCircle(x1, y1, 26.f, Path.Direction.CW);
+            _path.addCircle(x1, y1, 20.f, Path.Direction.CW);
 
             Paint notifyPaint = new Paint();
-            notifyPaint.setTextSize(20);
+
+            notifyPaint.setTextSize(18);
             notifyPaint.setTextAlign(Paint.Align.CENTER);
             notifyPaint.setTypeface(Typeface.DEFAULT_BOLD);
             notifyPaint.setColor(getResources().getColor(android.R.color.white));

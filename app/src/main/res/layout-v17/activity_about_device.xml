@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/background"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:background="@drawable/ic_title_bg"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:src="@drawable/about_facility_chect"
+            android:layout_marginLeft="12dp"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text="@string/title_about_device"
+            android:textSize="32dp"
+            android:layout_marginLeft="72dp"
+            android:textColor="@android:color/black"
+            android:layout_gravity="right|center"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@drawable/main_back"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="72dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:padding="16dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/about_device_name"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="@string/about_device_string"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/darker_gray"/>
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/about_device_2dcode"
+                android:textSize="22dp"
+                android:layout_width="150dp"
+                android:textColor="@android:color/black"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:src="@drawable/two_dimension02"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/darker_gray"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/about_device_id"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="WFD86"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/darker_gray"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/about_device_mac"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/macaddr"
+                android:text="c8:60:00:a0:50:f4"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/darker_gray"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/about_device_ip"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="0.0.0.0"
+                android:id="@+id/ipaddr"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/darker_gray"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/about_device_storage"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="2.5G\n3.8G"
+                android:textSize="22dp"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        </LinearLayout>
+</LinearLayout>

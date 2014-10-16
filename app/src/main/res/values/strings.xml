@@ -12,4 +12,23 @@
     <string name="deviceid">设备号：</string>
     <string name="images_header_status">当前总共有%1$d个图片文件</string>
     <string name="videos_header_status">当前总共有%1$d个视频文件</string>
+    <string name="description">Media Controls</string>
+    <string name="imagebrowsetype">图片浏览模式</string>
+    <string name="videobrowsetype">视频浏览模式</string>
+    <string name="title_tools">实用工具</string>
+    <string name="title_about">关于设备</string>
+    <string name="title_buddylist">视频通话</string>
+    <string name="title_about_product">产品指南</string>
+    <string name="title_about_company">公司介绍</string>
+    <string name="title_about_device">关于设备</string>
+    <string name="about_device_name">设备名称：</string>
+    <string name="about_device_string">沃飞数码伴侣</string>
+    <string name="about_device_2dcode">二维码：</string>
+    <string name="about_device_id">型号：</string>
+    <string name="about_device_mac">MAC地址：</string>
+    <string name="about_device_ip">IP地址：</string>
+    <string name="about_device_storage">可用容量\n总存储容量</string>
+    <string name="title_option">设置</string>
+    <string name="snsbrowsetype">SNS浏览模式</string>
+    <string name="snsloadinginfo">请稍等，正在努力加载家人动态...</string>
 </resources>

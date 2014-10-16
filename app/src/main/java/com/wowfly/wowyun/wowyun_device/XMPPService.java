@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.os.Message;
 import android.provider.ContactsContract;
 import android.util.Log;
 
@@ -43,6 +44,7 @@ public class XMPPService {
     private Collection<RosterEntry> mRECollection;
     private List<Map<String, Object>> mBuddyDataList;
     private RosterListener rosterListener;
+    private MainActivity mainActivity;
 
     public static class BuddyInfo {
         String name;
@@ -120,6 +122,9 @@ public class XMPPService {
                             subscribed = new Presence(Presence.Type.subscribe);
                             subscribed.setTo(presence.getFrom());
                             mConn.sendPacket(subscribed);
+                            Message msg = new Message();
+                            msg.what = WowYunApp.XMPP_NEW_BUDDY;
+                            mainActivity.mHandler.sendMessage(msg);
                             return true;
                         }
                         if(presence.getType().equals(Presence.Type.unsubscribe))
@@ -135,6 +140,10 @@ public class XMPPService {
         }
     }
 
+    public void setMainActivity(MainActivity activity) {
+        mainActivity = activity;
+    }
+
     public void addRosterListener(RosterListener listener) {
         if(mConn.isConnected()) {
             Log.i(TAG, "add new roster listener ");
@@ -143,7 +152,7 @@ public class XMPPService {
     }
 
     public int getBuddyCount() {
-        return mRECollection.size();
+        return mBuddyInfo.size();
     }
 
     public BuddyInfo getBuddyInfo(int pos) {
@@ -153,7 +162,7 @@ public class XMPPService {
     public void getBuddyList() {
         Roster r = mConn.getRoster();
 
-        r.reload();
+        //r.reload();
 
         mRECollection = r.getEntries();
 
@@ -166,6 +175,10 @@ public class XMPPService {
             info.name = entry.getName();
             info.jid = entry.getUser();
             info.isAvailable = r.getPresence(info.jid).isAvailable();
+            if(info.name == null) {
+                int sep = info.jid.lastIndexOf('@');
+                info.name = info.jid.substring(0, sep);
+            }
             mBuddyInfo.add(info);
 
             Map<String, Object> item = new HashMap<String, Object>();
@@ -181,6 +194,7 @@ public class XMPPService {
                 item.put("name", info.jid);
             mBuddyDataList.add(item);
         }
+        Log.i(TAG, " getBuddyList.buddysize = " + mBuddyInfo.size());
         bBuddyData = true;
     }
 
@@ -232,6 +246,12 @@ public class XMPPService {
         }
     }
 
+    public boolean isConnected() {
+        if(mConn != null)
+            return mConn.isConnected();
+        else
+            return false;
+    }
     public boolean doLogin(String user, String passwd, ChatManagerListener listener) {
         try {
             if(mConn.isConnected() == false) {
@@ -292,6 +312,10 @@ public class XMPPService {
             }
         }
         return false;
+    }
+
+    public boolean isLogin() {
+        return bLogin;
     }
 
     public boolean doDelete() {

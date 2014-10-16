@@ -1,14 +1,18 @@
 package com.wowfly.wowyun.wowyun_device;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -36,6 +40,9 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by user on 9/3/14.
@@ -52,24 +59,14 @@ public class MediaBrowserActivity extends Activity {
     protected TextView mInfoHeader;
     protected GridView mMediaView;
     protected AsyncHttpClient mHttpClient;
-    protected ArrayList<WebAlbumInfo> mWebAlbumImageList;
-    protected ArrayList<WebAlbumInfo> mWebAlbumVideoList;
+    protected ArrayList<WowYunApp.WebAlbumInfo> mWebAlbumImageList;
+    protected ArrayList<WowYunApp.WebAlbumInfo> mWebAlbumVideoList;
     protected int mBrowseType;
     protected int mType;
     private String mFormatString;
 
     protected static final int MEDIA_TYPE_IMAGE = 0x7001;
     protected static final int MEDIA_TYPE_VIDEO = 0x7002;
-
-    protected static final int BROWSE_MEDIA_LOCAL = 0x8001;
-    protected static final int BROWSE_MEDIA_WEBALBUM = 0x8002;
-    protected static final int BROWSE_MEDIA_ALL = 0x8003;
-
-
-    protected static class WebAlbumInfo {
-        String thumbpath;
-        String imagepath;
-    }
 
 /*    protected static class MediaItem {
         String thumb;
@@ -109,7 +106,7 @@ public class MediaBrowserActivity extends Activity {
                         case XmlPullParser.START_TAG:
                             //Log.i(TAG, "start tag = " + parser.getName());
                             if (parser.getName().equals("item")) {
-                                WebAlbumInfo waItem = new WebAlbumInfo();
+                                WowYunApp.WebAlbumInfo waItem = new WowYunApp.WebAlbumInfo();
                                 String mime = parser.getAttributeValue(0);
                                 waItem.thumbpath = parser.getAttributeValue(1);
                                 waItem.imagepath = parser.getAttributeValue(2);
@@ -136,6 +133,11 @@ public class MediaBrowserActivity extends Activity {
                 }
                 //mInfoHeader.setText(String.format(mFormatString, ));
                 mInfoHeader.setText(String.format(mFormatString, mType==MEDIA_TYPE_IMAGE? getImageCount(): getVideoCount()));
+                //mMediaView.setSelection(0);
+                //mMediaView.setSelected(true);
+                BaseAdapter adapter = (BaseAdapter) mMediaView.getAdapter();
+                adapter.notifyDataSetInvalidated();
+
             } catch (XmlPullParserException e) {
                 Log.i(TAG, " XmlPullParserException ");
             } catch (IOException e) {
@@ -160,8 +162,6 @@ public class MediaBrowserActivity extends Activity {
 
     public MediaBrowserActivity() {
         mHttpClient = new AsyncHttpClient();
-        mWebAlbumImageList = new ArrayList<WebAlbumInfo>();
-        mWebAlbumVideoList = new ArrayList<WebAlbumInfo>();
     }
 
     private void init_UIL() {
@@ -195,7 +195,7 @@ public class MediaBrowserActivity extends Activity {
     }
 
     protected void displayImage(int pos, ImageView imageView, DisplayImageOptions options, SimpleImageLoadingListener listener) {
-        if(mBrowseType == BROWSE_MEDIA_ALL || mBrowseType == BROWSE_MEDIA_LOCAL) {
+        if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL || mBrowseType == WowYunApp.BROWSE_MEDIA_LOCAL) {
             Log.i(TAG, " displayImage mType");
             if (pos < mInfo.getImageCount()) {
                 Log.i(TAG, "display local media " + pos + " id " + mInfo.getImageId(pos));
@@ -204,9 +204,9 @@ public class MediaBrowserActivity extends Activity {
             }
         }
 
-        if(mBrowseType == BROWSE_MEDIA_ALL || mBrowseType == BROWSE_MEDIA_WEBALBUM) {
+        if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL || mBrowseType == WowYunApp.BROWSE_MEDIA_WEBALBUM) {
             int offset = 0;
-            if(mBrowseType == BROWSE_MEDIA_ALL)
+            if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL)
                 offset = mInfo.getImageCount();
 
             if(mWebAlbumImageList.size() > 0) {
@@ -218,15 +218,15 @@ public class MediaBrowserActivity extends Activity {
     }
 
     protected void displayVideo(int pos, ImageView imageView, DisplayImageOptions options, SimpleImageLoadingListener listener) {
-        if(mBrowseType == BROWSE_MEDIA_ALL || mBrowseType == BROWSE_MEDIA_LOCAL) {
+        if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL || mBrowseType == WowYunApp.BROWSE_MEDIA_LOCAL) {
             if (pos < mInfo.getVideoCount()) {
                 imgLoader.displayImage("image/" + mInfo.getVideoId(pos), imageView, options, listener);
                 return;
             }
         }
-        if(mBrowseType == BROWSE_MEDIA_ALL || mBrowseType == BROWSE_MEDIA_WEBALBUM) {
+        if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL || mBrowseType == WowYunApp.BROWSE_MEDIA_WEBALBUM) {
             int offset = 0;
-            if(mBrowseType == BROWSE_MEDIA_ALL)
+            if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL)
                 offset = mInfo.getVideoCount();
 
             if(mWebAlbumVideoList.size() > 0) {
@@ -237,6 +237,27 @@ public class MediaBrowserActivity extends Activity {
         }
     }
 
+
+    protected String getMediaUriByPosition(int pos) {
+        if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL || mBrowseType == WowYunApp.BROWSE_MEDIA_LOCAL) {
+            if (pos < mInfo.getVideoCount()) {
+                return mInfo.getVideoUri(pos);
+            }
+        }
+        if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL || mBrowseType == WowYunApp.BROWSE_MEDIA_WEBALBUM) {
+            int offset = 0;
+            if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL)
+                offset = mInfo.getVideoCount();
+
+            if(mWebAlbumVideoList.size() > 0) {
+                String path = "http://101.69.230.238:8081/" + mWebAlbumVideoList.get(pos - offset).imagepath;
+                Log.i(TAG, "display webalbum video media " + pos + " " + path);
+                //imgLoader.displayImage(thumb, imageView, options, listener);
+                return path;
+            }
+        }
+        return null;
+    }
 
     protected void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -249,8 +270,15 @@ public class MediaBrowserActivity extends Activity {
         setContentView(R.layout.activity_media_browser);
         mInfoHeader = (TextView) findViewById(R.id.mediaview_infoheader);
         mMediaView = (GridView) findViewById(R.id.media_gridview);
-        mMediaView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
+        //mMediaView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
         //mInfo.getImagesInfo(mPref);
+        WowYunApp _app = (WowYunApp) getApplication();
+        mWebAlbumImageList = _app.getWebAlbumInfo(true);
+        mWebAlbumVideoList = _app.getWebAlbumInfo(false);
+        Log.i(TAG, "_app = " + _app);
+
+        mWebAlbumImageList.clear();
+        mWebAlbumVideoList.clear();
     }
 
     protected void onDestroy() {
@@ -258,17 +286,72 @@ public class MediaBrowserActivity extends Activity {
         super.onDestroy();
 
     }
+
+    protected void showBrowseTypeSelectionDialog(Activity activity, int title_sid,  int opt_sid) {
+        final AlertDialog dlg;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(getResources().getString(title_sid));
+        //builder.setSingleChoiceItems()
+        builder.setSingleChoiceItems(opt_sid, mBrowseType - WowYunApp.BROWSE_MEDIA_ALL, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Log.i(TAG, " select item = " + i);
+                switch (i) {
+                    case 0:
+                        mBrowseType = WowYunApp.BROWSE_MEDIA_ALL;
+                        break;
+                    case 1:
+                        mBrowseType = WowYunApp.BROWSE_MEDIA_WEBALBUM;
+                        break;
+                    case 2:
+                        mBrowseType = WowYunApp.BROWSE_MEDIA_LOCAL;
+                        break;
+                }
+                mInfoHeader.setText(String.format(mFormatString, mType == MEDIA_TYPE_IMAGE ? getImageCount() : getVideoCount()));
+                BaseAdapter adapter = (BaseAdapter) mMediaView.getAdapter();
+                adapter.notifyDataSetInvalidated();
+
+                dialogInterface.cancel();
+            }
+        });
+        dlg = builder.create();
+        dlg.show();
+
+/*        List<Map<String, Object>> optionList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> item = new HashMap<String, Object>();
+
+        item.put("name", getResources().getString(R.string.dialog_buddy_option2));
+        item.put("details", getResources().getString(R.string.dialog_buddy_option2_details));
+        optionList.add(item);
+
+        item = new HashMap<String, Object>();
+        //item.put("icon", R.drawable.ic_option_icon_setting);
+        item.put("name", getResources().getString(R.string.dialog_buddy_option3));
+        item.put("details", getResources().getString(R.string.dialog_buddy_option3_details));
+        optionList.add(item);*/
+    }
+
+/*    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_MENU:
+                showBrowseTypeSelectionDialog();
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
+    }*/
+
     protected int getImageCount() {
         int count = 0;
 
         switch (mBrowseType) {
-            case BROWSE_MEDIA_ALL:
+            case WowYunApp.BROWSE_MEDIA_ALL:
                 count += mWebAlbumImageList.size();
-            case BROWSE_MEDIA_LOCAL:
+            case WowYunApp.BROWSE_MEDIA_LOCAL:
                 count += mInfo.getImageCount();
             break;
 
-            case BROWSE_MEDIA_WEBALBUM:
+            case WowYunApp.BROWSE_MEDIA_WEBALBUM:
                 count += mWebAlbumImageList.size();
                 break;
         }
@@ -280,13 +363,13 @@ public class MediaBrowserActivity extends Activity {
         int count = 0;
 
         switch (mBrowseType) {
-            case BROWSE_MEDIA_ALL:
+            case WowYunApp.BROWSE_MEDIA_ALL:
                 count += mWebAlbumVideoList.size();
-            case BROWSE_MEDIA_LOCAL:
+            case WowYunApp.BROWSE_MEDIA_LOCAL:
                 count += mInfo.getVideoCount();
                 break;
 
-            case BROWSE_MEDIA_WEBALBUM:
+            case WowYunApp.BROWSE_MEDIA_WEBALBUM:
                 count += mWebAlbumVideoList.size();
                 break;
         }

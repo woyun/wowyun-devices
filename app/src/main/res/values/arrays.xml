@@ -9,4 +9,29 @@
         <item>实用工具</item>
         <item>关于设备</item>
     </string-array>
+    <string-array name="imagebrowsetype">
+        <item>所有图片</item>
+        <item>云端图片</item>
+        <item>本地图片</item>
+    </string-array>
+    <string-array name="videobrowsetype">
+        <item>所有视频</item>
+        <item>云端视频</item>
+        <item>本地视频</item>
+    </string-array>
+    <string-array name="imageopt">
+        <item>按日期排序</item>
+        <item>按大小排序</item>
+        <item>按用户排序</item>
+    </string-array>
+    <string-array name="videoopt">
+        <item>按日期排序</item>
+        <item>按大小排序</item>
+        <item>按用户排序</item>
+    </string-array>
+    <string-array name="snssortopt">
+        <item>按好友排序</item>
+        <item>按时间排序</item>
+        <item>按平台排序</item>
+    </string-array>
 </resources>

@@ -14,7 +14,7 @@ class UserLocationUtils {
     LocationManager lm;
     LocationResult locationResult;
     boolean gps_enabled=false;
-    boolean network_enabled=false;
+    boolean network_enabled=true;
 
     /*
      * need permission

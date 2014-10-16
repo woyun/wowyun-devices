@@ -1,10 +1,12 @@
 package com.wowfly.wowyun.wowyun_device;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -34,11 +36,21 @@ public class ImageBrowserActivity extends MediaBrowserActivity {
         }
     };
 
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_MENU:
+                showBrowseTypeSelectionDialog(this, R.string.imagebrowsetype, R.array.imagebrowsetype);
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     public void onCreate(Bundle saved) {
         int count = 0;
         super.onCreate(saved);
 
-        mBrowseType = BROWSE_MEDIA_ALL;
+        mBrowseType = mPref.getInt("browse.image.type", WowYunApp.BROWSE_MEDIA_ALL);
+        //mBrowseType = BROWSE_MEDIA_ALL;
         mType = MEDIA_TYPE_IMAGE;
 
         mInfo.getImagesInfo(mPref);
@@ -47,8 +59,16 @@ public class ImageBrowserActivity extends MediaBrowserActivity {
         mMediaView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+/*                if(mBrowseType == WowYunApp.BROWSE_MEDIA_ALL) {
+                    if(i >= mInfo.getImageCount()) {
+                        i = -(i - mInfo.getImageCount());
+                    }
+                } else if(mBrowseType == WowYunApp.BROWSE_MEDIA_WEBALBUM) {
+                    i = -i;
+                }*/
                 Intent intent = new Intent(mContext, ImageViewer.class);
                 intent.putExtra("position", i);
+                intent.putExtra("browsetype", mBrowseType);
                 startActivity(intent);
             }
         });
@@ -58,6 +78,14 @@ public class ImageBrowserActivity extends MediaBrowserActivity {
         Log.i(TAG, " url = " + "http://101.69.230.238:8080/list/" + _app.deviceID);
 
         displayMediaInfo(R.string.images_header_status, getImageCount());
+    }
+
+    public void onDestroy() {
+        SharedPreferences.Editor editor = mPref.edit();
+        editor.putInt("browse.image.type", mBrowseType);
+        editor.commit();
+
+        super.onDestroy();
     }
 
     public class ImageViewAdapter extends BaseAdapter {
